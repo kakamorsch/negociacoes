@@ -20,6 +20,24 @@ class NegociacaoController{
         this._mensagem.texto= 'Negociacao adicionada com sucesso!'
         this._limpaFormulario();
     }
+    importaNegociacoes(){  
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', 'negociacoes/semana');
+        xhr.onreadystatechange = ()=>{
+            if(xhr.readyState==4){
+                if(xhr.status== 200){
+                    console.log("Obtendo as negociacoes do servidor.")
+                    JSON.parse(xhr.responseText)
+                    .map((objeto)=>new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
+                    .forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+                }else{
+                    console.log(xhr.responseText);
+                    this._mensagem.texto = 'Nao foi possivel realizar sua requisicao'
+                }
+            }
+        }
+        xhr.send();
+    }
     //esvazia o array de negociacoes, atualiza a view e atualiza a view das mensagens
     apaga(){
         this._listaNegociacoes.esvazia();
