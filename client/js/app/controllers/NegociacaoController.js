@@ -21,6 +21,14 @@ class NegociacaoController {
       new MensagemView($("#mensagemView")),
       "texto"
     );
+    ConnectionFactory.getConnection()
+      .then(connection => new NegociacaoDao(connection))
+      .then(dao => dao.listaTodos())
+      .then(negociacoes =>
+        negociacoes.forEach(negociacao =>
+          this._listaNegociacoes.adiciona(negociacao)
+        )
+      );
   }
   //
   adiciona(event) {
@@ -35,7 +43,7 @@ class NegociacaoController {
           this._limpaFormulario();
         });
       })
-      .catch(erro => this._mensagem.texto = erro);
+      .catch(erro => (this._mensagem.texto = erro));
   }
   importaNegociacoes() {
     let service = new NegociacaoService();
