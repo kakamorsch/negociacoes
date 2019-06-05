@@ -21,6 +21,9 @@ class NegociacaoController {
       new MensagemView($("#mensagemView")),
       "texto"
     );
+    this._init();
+  }
+  _init() {
     ConnectionFactory.getConnection()
       .then(connection => new NegociacaoDao(connection))
       .then(dao => dao.listaTodos())
@@ -33,19 +36,23 @@ class NegociacaoController {
         console.log(erro);
         this._mensagem.texto = error;
       });
+
+    setInterval(() => {
+      this.importaNegociacoes();
+    }, 3000);
   }
-  //
+
   adiciona(event) {
     event.preventDefault();
 
-    ConnectionFactory.getConnection() //chama o metodo estatico do ConnectionFactory para abrir uma conexao
-      .then(connection => {
-        let negociacao = this._criaNegociacao();
-        new NegociacaoDao(connection).adiciona(negociacao).then(() => {
-          this._listaNegociacoes.adiciona(this._criaNegociacao());
-          this._mensagem.texto = "Negociacao adicionada com sucesso!";
-          this._limpaFormulario();
-        });
+    let negociacao = this._criaNegociacao();
+
+    new NegociacaoService()
+      .cadastra(negociacao)
+      .then(mensagem => {
+        this._listaNegociacoes.adiciona(negociacao);
+        this._mensagem.texto = mensagem;
+        this._limpaFormulario();
       })
       .catch(erro => (this._mensagem.texto = erro));
   }
