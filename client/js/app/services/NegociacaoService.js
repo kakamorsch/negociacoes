@@ -109,13 +109,30 @@ class NegociacaoService {
       });
   }
   apaga() {
-    return ConnectionFactory.getConnection()
-      .then(connection => new NegociacaoDao(connection))
+    return ConnectionFactory
+      .getConnection()
+      .then(connection => new NegociacaoController(connection))
       .then(dao => dao.apagaTodos())
       .then(() => "negociacoes apagadas com sucesso")
       .catch(erro => {
         console.log(erro);
-        throw new Error("Nao foi possivel apagar as negociacoes");
+        throw new Error("Nao foi possivel apagar as negociacoes")
+      })
+  }
+  importa(listaAtual){
+    return this.obterNegociacoes()
+      .then(negociacoes =>
+        negociacoes.filter(
+          negociacao =>
+            !listaAtual.some(
+              negociacaoExistente =>
+                JSON.stringify(negociacao) ==
+                JSON.stringify(negociacaoExistente)
+            )
+        )
+      ).catch(erro=> {
+        console.log(erro);
+        throw new Error('Nao foi possivel importar as negociacoes')
       });
   }
 }
